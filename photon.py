@@ -16,18 +16,35 @@ import i18n
 from core.colors import good, info, run, green, red, white, end, bad
 
 # Just a fancy ass banner
-print('''%s      ____  __          __
+print(
+    """%s      ____  __          __
      / %s__%s \/ /_  ____  / /_____  ____
     / %s/_/%s / __ \/ %s__%s \/ __/ %s__%s \/ __ \\
    / ____/ / / / %s/_/%s / /_/ %s/_/%s / / / /
-  /_/   /_/ /_/\____/\__/\____/_/ /_/ %sv1.3.2%s\n''' %
-      (red, white, red, white, red, white, red, white, red, white, red, white,
-       red, white, end))
+  /_/   /_/ /_/\____/\__/\____/_/ /_/ %sv1.3.2%s\n"""
+    % (
+        red,
+        white,
+        red,
+        white,
+        red,
+        white,
+        red,
+        white,
+        red,
+        white,
+        red,
+        white,
+        red,
+        white,
+        end,
+    )
+)
 
 try:
     from urllib.parse import urlparse  # For Python 3
 except ImportError:
-    print('%s Photon runs only on Python 3.2 and above.' % info)
+    print("%s Photon runs only on Python 3.2 and above." % info)
     quit()
 
 import core.config
@@ -37,22 +54,26 @@ from core.mirror import mirror
 from core.prompt import prompt
 from core.requester import requester
 from core.updater import updater
-from core.utils import (luhn,
-                        proxy_type,
-                        is_good_proxy,
-                        top_level,
-                        extract_headers,
-                        verb, is_link,
-                        entropy, regxy,
-                        remove_regex,
-                        timer,
-                        writer)
+from core.utils import (
+    luhn,
+    proxy_type,
+    is_good_proxy,
+    top_level,
+    extract_headers,
+    verb,
+    is_link,
+    entropy,
+    regxy,
+    remove_regex,
+    timer,
+    writer,
+)
 from core.regex import rintels, rendpoint, rhref, rscript, rentropy
 
 from core.zap import zap
 
 # Disable SSL related warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 # Processing command line arguments
 parser = argparse.ArgumentParser()
@@ -84,15 +105,14 @@ parser.add_argument('--update', help=i18n.t('photon.help.update'), dest='update'
 parser.add_argument('--only-urls', help=i18n.t('photon.help.only-urls'), dest='only_urls', action='store_true')
 parser.add_argument('--wayback', help=i18n.t('photon.help.wayback'), dest='archive', action='store_true')
 
-
 args = parser.parse_args()
 
 
-i18n.load_path.append('./translations')
+i18n.load_path.append("./translations")
 
 if args.lang:
-    i18n.set('locale', args.lang)
-    i18n.set('fallback', 'en')
+    i18n.set("locale", args.lang)
+    i18n.set("fallback", "en")
 
 # If the user has supplied --update argument
 if args.update:
@@ -102,12 +122,12 @@ if args.update:
 # If the user has supplied a URL
 if args.root:
     main_inp = args.root
-    if main_inp.endswith('/'):
+    if main_inp.endswith("/"):
         # We will remove it as it can cause problems later in the code
         main_inp = main_inp[:-1]
 # If the user hasn't supplied an URL
 else:
-    print('\n' + parser.format_help().lower())
+    print("\n" + parser.format_help().lower())
     quit()
 
 clone = args.clone
@@ -120,15 +140,15 @@ api = bool(args.api)  # Extract high entropy strings i.e. API keys and stuff
 
 proxies = []
 if args.proxies:
-    print(info, i18n.t('photon.proxy.test'))
+    print(info, i18n.t("photon.proxy.test"))
     for proxy in args.proxies:
         if is_good_proxy(proxy):
             proxies.append(proxy)
         else:
-            print(i18n.t('photon.proxy.incorrect', bad=bad, proxy=proxy['http']))
-    print(i18n.t('photon.proxy.incorrect', info=info))
+            print(i18n.t("photon.proxy.incorrect", bad=bad, proxy=proxy["http"]))
+    print(i18n.t("photon.proxy.incorrect", info=info))
     if not proxies:
-        print(i18n.t('photon.proxy.no-working', bad=bad))
+        print(i18n.t("photon.proxy.no-working", bad=bad))
         exit()
 else:
     proxies.append(None)
@@ -149,13 +169,13 @@ external = set()  # URLs that don't belong to the target i.e. out-of-scope
 # URLs that have get params in them e.g. example.com/page.php?id=2
 fuzzable = set()
 endpoints = set()  # URLs found from javascript files
-processed = set(['dummy'])  # URLs that have been crawledpt
+processed = set(["dummy"])  # URLs that have been crawledpt
 # URLs that belong to the target i.e. in-scope
 internal = set(args.seeds)
 
 everything = []
 bad_scripts = set()  # Unclean javascript file urls
-bad_intel = set() # needed for intel filtering
+bad_intel = set()  # needed for intel filtering
 
 core.config.verbose = verbose
 
@@ -163,21 +183,21 @@ if headers:
     try:
         prompt = prompt()
     except FileNotFoundError as e:
-        print(i18n.t('photon.proxy.no-working', e=e))
+        print(i18n.t("photon.proxy.no-working", e=e))
         quit()
     headers = extract_headers(prompt)
 
 # If the user hasn't supplied the root URL with http(s), we will handle it
-if main_inp.startswith('http'):
+if main_inp.startswith("http"):
     main_url = main_inp
 else:
     try:
-        requests.get('https://' + main_inp, proxies=random.choice(proxies))
-        main_url = 'https://' + main_inp
+        requests.get("https://" + main_inp, proxies=random.choice(proxies))
+        main_url = "https://" + main_inp
     except:
-        main_url = 'http://' + main_inp
+        main_url = "http://" + main_inp
 
-schema = main_url.split('//')[0] # https: or http:?
+schema = main_url.split("//")[0]  # https: or http:?
 # Adding the root URL to internal for crawling
 internal.add(main_url)
 # Extracts host out of the URL
@@ -191,23 +211,24 @@ except:
     domain = host
 
 if args.user_agent:
-    user_agents = args.user_agent.split(',')
+    user_agents = args.user_agent.split(",")
 else:
-    with open(sys.path[0] + '/core/user-agents.txt', 'r') as uas:
-        user_agents = [agent.strip('\n') for agent in uas]
+    with open(sys.path[0] + "/core/user-agents.txt", "r") as uas:
+        user_agents = [agent.strip("\n") for agent in uas]
 
 
 supress_regex = False
 
+
 def intel_extractor(url, response):
     """Extract intel from the response body."""
     for rintel in rintels:
-        res = re.sub(r'<(script).*?</\1>(?s)', '', response)
-        res = re.sub(r'<[^<]+?>', '', res)
+        res = re.sub(r"<(script).*?</\1>(?s)", "", response)
+        res = re.sub(r"<[^<]+?>", "", res)
         matches = rintel[0].findall(res)
         if matches:
             for match in matches:
-                verb('Intel', match)
+                verb("Intel", match)
                 bad_intel.add((match, rintel[1], url))
 
 
@@ -216,57 +237,71 @@ def js_extractor(response):
     # Extract .js files
     matches = rscript.findall(response)
     for match in matches:
-        match = match[2].replace('\'', '').replace('"', '')
-        verb('JS file', match)
+        match = match[2].replace("'", "").replace('"', "")
+        verb("JS file", match)
         bad_scripts.add(match)
 
+
 def remove_file(url):
-    if url.count('/') > 2:
-        replacable = re.search(r'/[^/]*?$', url).group()
-        if replacable != '/':
-            return url.replace(replacable, '')
+    if url.count("/") > 2:
+        replacable = re.search(r"/[^/]*?$", url).group()
+        if replacable != "/":
+            return url.replace(replacable, "")
         else:
             return url
     else:
         return url
 
+
 def extractor(url):
     """Extract details from the response body."""
-    response = requester(url, main_url, delay, cook, headers, timeout, host, proxies, user_agents, failed, processed)
+    response = requester(
+        url,
+        main_url,
+        delay,
+        cook,
+        headers,
+        timeout,
+        host,
+        proxies,
+        user_agents,
+        failed,
+        processed,
+    )
     if clone:
         mirror(url, response)
     matches = rhref.findall(response)
     for link in matches:
         # Remove everything after a "#" to deal with in-page anchors
-        link = link[1].replace('\'', '').replace('"', '').split('#')[0]
+        link = link[1].replace("'", "").replace('"', "").split("#")[0]
         # Checks if the URLs should be crawled
         if is_link(link, processed, files):
-            if link[:4] == 'http':
+            if link[:4] == "http":
                 if link.startswith(main_url):
-                    verb('Internal page', link)
+                    verb("Internal page", link)
                     internal.add(link)
                 else:
-                    verb('External page', link)
+                    verb("External page", link)
                     external.add(link)
-            elif link[:2] == '//':
-                if link.split('/')[2].startswith(host):
-                    verb('Internal page', link)
-                    internal.add(schema + '://' + link)
+            elif link[:2] == "//":
+                if link.split("/")[2].startswith(host):
+                    verb("Internal page", link)
+                    internal.add(schema + "://" + link)
                 else:
-                    verb('External page', link)
+                    verb("External page", link)
                     external.add(link)
-            elif link[:1] == '/':
-                verb('Internal page', link)
+            elif link[:1] == "/":
+                verb("Internal page", link)
                 internal.add(remove_file(url) + link)
             else:
-                verb('Internal page', link)
+                verb("Internal page", link)
                 usable_url = remove_file(url)
-                if usable_url.endswith('/'):
+                if usable_url.endswith("/"):
                     internal.add(usable_url + link)
-                elif link.startswith('/'):
+                elif link.startswith("/"):
                     internal.add(usable_url + link)
                 else:
-                    internal.add(usable_url + '/' + link)
+                    internal.add(usable_url + "/" + link)
 
     if not only_urls:
         intel_extractor(url, response)
@@ -277,13 +312,25 @@ def extractor(url):
         matches = rentropy.findall(response)
         for match in matches:
             if entropy(match) >= 4:
-                verb('Key', match)
-                keys.add(url + ': ' + match)
+                verb("Key", match)
+                keys.add(url + ": " + match)
 
 
 def jscanner(url):
     """Extract endpoints from JavaScript code."""
-    response = requester(url, main_url, delay, cook, headers, timeout, host, proxies, user_agents, failed, processed)
+    response = requester(
+        url,
+        main_url,
+        delay,
+        cook,
+        headers,
+        timeout,
+        host,
+        proxies,
+        user_agents,
+        failed,
+        processed,
+    )
     # Extract URLs/endpoints
     matches = rendpoint.findall(response)
     # Iterate over the matches, match is a tuple
@@ -291,8 +338,8 @@ def jscanner(url):
         # Combining the items because one of them is always empty
         match = match[0] + match[1]
         # Making sure it's not some JavaScript code
-        if not re.search(r'[}{><"\']', match) and not match == '/':
-            verb('JS endpoint', match)
+        if not re.search(r'[}{><"\']', match) and not match == "/":
+            verb("JS endpoint", match)
             endpoints.add(match)
 
 
@@ -316,33 +363,33 @@ for level in range(crawl_level):
     elif len(internal) <= len(processed):
         if len(internal) > 2 + len(args.seeds):
             break
-    print('%s Level %i: %i URLs' % (run, level + 1, len(links)))
+    print("%s Level %i: %i URLs" % (run, level + 1, len(links)))
     try:
         flash(extractor, links, thread_count, i18n)
     except KeyboardInterrupt:
-        print('')
+        print("")
         break
 
 if not only_urls:
     for match in bad_scripts:
         if match.startswith(main_url):
             scripts.add(match)
-        elif match.startswith('/') and not match.startswith('//'):
+        elif match.startswith("/") and not match.startswith("//"):
             scripts.add(main_url + match)
-        elif not match.startswith('http') and not match.startswith('//'):
-            scripts.add(main_url + '/' + match)
+        elif not match.startswith("http") and not match.startswith("//"):
+            scripts.add(main_url + "/" + match)
     # Step 3. Scan the JavaScript files for endpoints
-    print(i18n.t('photon.crawling', run=run, len=len(scripts)))
+    print(i18n.t("photon.crawling", run=run, len=len(scripts)))
     flash(jscanner, scripts, thread_count, i18n)
 
     for url in internal:
-        if '=' in url:
+        if "=" in url:
             fuzzable.add(url)
 
     for match, intel_name, url in bad_intel:
         if isinstance(match, tuple):
             for x in match:  # Because "match" is a tuple
-                if x != '':  # If the value isn't empty
+                if x != "":  # If the value isn't empty
                     if intel_name == "CREDIT_CARD":
                         if not luhn(match):
                             # garbage number
@@ -364,66 +411,95 @@ if not only_urls:
 # Records the time at which crawling stopped
 now = time.time()
 # Finds total time taken
-diff = (now - then)
+diff = now - then
 minutes, seconds, time_per_request = timer(diff, processed)
 
 # Step 4. Save the results
 if not os.path.exists(output_dir):  # if the directory doesn't exist
     os.mkdir(output_dir)  # create a new directory
 
-datasets = [files, intel, robots, custom, failed, internal, scripts,
-            external, fuzzable, endpoints, keys]
+datasets = [
+    files,
+    intel,
+    robots,
+    custom,
+    failed,
+    internal,
+    scripts,
+    external,
+    fuzzable,
+    endpoints,
+    keys,
+]
 
-dataset_names = [i18n.t('photon.dataset.names.files'),
-                 i18n.t('photon.dataset.names.intel'),
-                 i18n.t('photon.dataset.names.robots'),
-                 i18n.t('photon.dataset.names.custom'),
-                 i18n.t('photon.dataset.names.failed'),
-                 i18n.t('photon.dataset.names.internal'),
-                 i18n.t('photon.dataset.names.scripts'),
-                 i18n.t('photon.dataset.names.external'),
-                 i18n.t('photon.dataset.names.fuzzable'),
-                 i18n.t('photon.dataset.names.endpoints'),
-                 i18n.t('photon.dataset.names.keys')]
+dataset_names = [
+    i18n.t("photon.dataset.names.files"),
+    i18n.t("photon.dataset.names.intel"),
+    i18n.t("photon.dataset.names.robots"),
+    i18n.t("photon.dataset.names.custom"),
+    i18n.t("photon.dataset.names.failed"),
+    i18n.t("photon.dataset.names.internal"),
+    i18n.t("photon.dataset.names.scripts"),
+    i18n.t("photon.dataset.names.external"),
+    i18n.t("photon.dataset.names.fuzzable"),
+    i18n.t("photon.dataset.names.endpoints"),
+    i18n.t("photon.dataset.names.keys"),
+]
 
 writer(datasets, dataset_names, output_dir)
 # Printing out results
-print(('%s-%s' % (red, end)) * 50)
+print(("%s-%s" % (red, end)) * 50)
 for dataset, dataset_name in zip(datasets, dataset_names):
     if dataset:
-        print(i18n.t('photon.dataset.message', good=good, dataset_name=dataset_name.capitalize(), len_dataset=len(dataset)))
-print(('%s-%s' % (red, end)) * 50)
+        print(
+            i18n.t(
+                "photon.dataset.message",
+                good=good,
+                dataset_name=dataset_name.capitalize(),
+                len_dataset=len(dataset),
+            )
+        )
+print(("%s-%s" % (red, end)) * 50)
 
-print(i18n.t('photon.total.requests', info=info, len=len(processed)))
-print(i18n.t('photon.total.time', info=info, minutes=minutes, seconds=seconds))
-print(i18n.t('photon.total.req-per-second', info=info, i=int(len(processed) / diff)))
+print(i18n.t("photon.total.requests", info=info, len=len(processed)))
+print(i18n.t("photon.total.time", info=info, minutes=minutes, seconds=seconds))
+print(i18n.t("photon.total.req-per-second", info=info, i=int(len(processed) / diff)))
 
 datasets = {
-    'files': list(files), 'intel': list(intel), 'robots': list(robots),
-    'custom': list(custom), 'failed': list(failed), 'internal': list(internal),
-    'scripts': list(scripts), 'external': list(external),
-    'fuzzable': list(fuzzable), 'endpoints': list(endpoints),
-    'keys': list(keys)
+    "files": list(files),
+    "intel": list(intel),
+    "robots": list(robots),
+    "custom": list(custom),
+    "failed": list(failed),
+    "internal": list(internal),
+    "scripts": list(scripts),
+    "external": list(external),
+    "fuzzable": list(fuzzable),
+    "endpoints": list(endpoints),
+    "keys": list(keys),
 }
 
 if args.dns:
-    print('%s Enumerating subdomains' % run)
+    print("%s Enumerating subdomains" % run)
     from plugins.find_subdomains import find_subdomains
+
     subdomains = find_subdomains(domain)
-    print('%s %i subdomains found' % (info, len(subdomains)))
-    writer([subdomains], ['subdomains'], output_dir)
-    datasets['subdomains'] = subdomains
+    print("%s %i subdomains found" % (info, len(subdomains)))
+    writer([subdomains], ["subdomains"], output_dir)
+    datasets["subdomains"] = subdomains
     from plugins.dnsdumpster import dnsdumpster
-    print('%s Generating DNS map' % run)
+
+    print("%s Generating DNS map" % run)
     dnsdumpster(domain, output_dir)
 
 if args.export:
     from plugins.exporter import exporter
+
     # exporter(directory, format, datasets)
     exporter(output_dir, args.export, datasets)
 
-print(i18n.t('photon.saved', good=good, green=green, output_dir=output_dir, end=end))
+print(i18n.t("photon.saved", good=good, green=green, output_dir=output_dir, end=end))
 
 if args.std:
     for string in datasets[args.std]:
-        sys.stdout.write(string + '\n')
+        sys.stdout.write(string + "\n")
