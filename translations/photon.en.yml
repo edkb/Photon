@@ -1,0 +1,57 @@
+pt:
+  help:
+    url: root url
+    cookie: cookie
+    regex: regex pattern
+    export: export format
+    output: output directory
+    level: levels to crawl
+    threads: number of threads
+    delay: delay between requests
+    verbose: verbose output
+    seeds: additional seed URLs
+    stdout: send variables to stdout
+    user-agent: custom user agent(s)
+    exclude: exclude URLs matching this regex
+    timeout: http request timeout
+    proxy: Proxy server IP:PORT or DOMAIN:PORT
+    clone: clone the website locally
+    headers: add headers
+    dns: enumerate subdomains and DNS data
+    keys: find secret keys
+    update: update photon
+    only-urls: only extract URLs
+    wayback: fetch URLs from archive.org as seeds
+    lang: selects language
+
+  proxy:
+    test: Testing proxies, can take a while...
+    incorrect: Proxy  doesn't seem to work or timedout
+    done: Feito
+    no-working: "%{bad} no working proxies, quitting!!"
+
+  headers:
+    not-load: "%{bad}Could not load headers prompt: %{e}"
+
+  total:
+    requests: "%{info} TTotal requests made: %{len}"
+    time: "%{info} TTotal time taken: %{minutes} minutes %{seconds} seconds"
+    req-per-second: "%{info} Requests per second: %{i}"
+
+  saved: "%{good} Results saved in %{green}%{output_dir}%{end} directory"
+  flash: "%{info} Progress: %{processed_links}/%{total_links}"
+  crawling: "%{run} Crawling %{len} JavaScript files"
+  dataset:
+    names:
+      files: files
+      intel: intel
+      robots: robots
+      custom: custom
+      failed: failed
+      internal: internal
+      scripts: scripts
+      external: external
+      fuzzable: fuzzable
+      endpoints: endpoints
+      keys: keys
+    message: "%{good} %{dataset_name} %{len_dataset}"
