@@ -1,0 +1,57 @@
+pt:
+  help:
+    url: URL raiz
+    cookie: cookie
+    regex: padrão de expressão regular (regex)
+    export: formato de exportação
+    output: diretório de saída
+    level: níveis para crowl
+    threads: número de threads
+    delay:  atraso entre requests
+    verbose: saída detalhada
+    seeds: URLs de semente adicionais
+    stdout: enviar variáveis ​​para stdout
+    user-agent: agente(s) de usuário customizado(s)
+    exclude: excluir URLs que correspondam a esta expressão regular (regex)
+    timeout: tempo limite de solicitação http
+    proxy: IP do servidor proxy IP:PORT ou DOMAIN:PORT
+    clone: ​​clonar o site localmente
+    headers: adicionar cabeçalhos
+    dns: enumerar subdomínios e dados DNS
+    keys: encontrar chaves secretas
+    update: atualizar photon
+    only-urls: extrai apenas URLs
+    wayback: buscar URLs do archive.org como sementes
+    lang: seleciona idima
+
+  proxy:
+    test: Testando proxies, pode demorar um pouco...
+    incorrect: Proxy {proxy} parece não estar funcionando ou deu timedout'
+    done: Feito
+    no-working: "%{bad}nenhum proxy funcionando, saindo!"
+
+  headers:
+    not-load: "%{bad} Não foi possível encontrar os headers %{e}"
+
+  total:
+    requests: "%{info} Total de requisições: %{len}"
+    time: "%{info} Tempo de execução: %{minutes} minutos %{seconds} segundos"
+    req-per-second: "%{info} Requisições por segundo: %{i}"
+
+  saved: "%{good} Resultados salvos na pasta %{green}%{output_dir}%{end}"
+  flash: "%{info} Progresso: %{processed_links}/%{total_links}"
+  crawling: "%{run} Crawling %{len} arquivos JavaScript"
+  dataset:
+    names:
+      files: arquivos
+      intel: intel
+      robots: robôs
+      custom: personalizado
+      failed: falha
+      internal: interno
+      scripts: scripts
+      external: externo
+      fuzzable: impreciso
+      endpoints: enpoints
+      keys: chaves
+    message: "%{good} %{dataset_name} %{len_dataset}"

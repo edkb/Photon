@@ -11,6 +11,7 @@ import sys
 import time
 import warnings
 import random
+import i18n
 
 from core.colors import good, info, run, green, red, white, end, bad
 
@@ -55,49 +56,43 @@ warnings.filterwarnings('ignore')
 
 # Processing command line arguments
 parser = argparse.ArgumentParser()
+
 # Options
-parser.add_argument('-u', '--url', help='root url', dest='root')
-parser.add_argument('-c', '--cookie', help='cookie', dest='cook')
-parser.add_argument('-r', '--regex', help='regex pattern', dest='regex')
-parser.add_argument('-e', '--export', help='export format', dest='export', choices=['csv', 'json'])
-parser.add_argument('-o', '--output', help='output directory', dest='output')
-parser.add_argument('-l', '--level', help='levels to crawl', dest='level',
-                    type=int)
-parser.add_argument('-t', '--threads', help='number of threads', dest='threads',
-                    type=int)
-parser.add_argument('-d', '--delay', help='delay between requests',
-                    dest='delay', type=float)
-parser.add_argument('-v', '--verbose', help='verbose output', dest='verbose',
-                    action='store_true')
-parser.add_argument('-s', '--seeds', help='additional seed URLs', dest='seeds',
-                    nargs="+", default=[])
-parser.add_argument('--stdout', help='send variables to stdout', dest='std')
-parser.add_argument('--user-agent', help='custom user agent(s)',
-                    dest='user_agent')
-parser.add_argument('--exclude', help='exclude URLs matching this regex',
-                    dest='exclude')
-parser.add_argument('--timeout', help='http request timeout', dest='timeout',
-                    type=float)
-parser.add_argument('-p', '--proxy', help='Proxy server IP:PORT or DOMAIN:PORT', dest='proxies',
-                    type=proxy_type)
+parser.add_argument('-u', '--url', help=i18n.t('photon.help.url'), dest='root')
+parser.add_argument('-c', '--cookie', help=i18n.t('photon.help.cookie'), dest='cook')
+parser.add_argument('-r', '--regex', help=i18n.t('photon.help.regex'), dest='regex')
+parser.add_argument('-e', '--export', help=i18n.t('photon.help.export'), dest='export', choices=['csv', 'json'])
+parser.add_argument('-o', '--output', help=i18n.t('photon.help.output'), dest='output')
+parser.add_argument('-l', '--level', help=i18n.t('photon.help.level'), dest='level', type=int)
+parser.add_argument('-t', '--threads', help=i18n.t('photon.help.threads'), dest='threads', type=int)
+parser.add_argument('-d', '--delay', help=i18n.t('photon.help.delay'), dest='delay', type=float)
+parser.add_argument('-v', '--verbose', help=i18n.t('photon.help.verbose'), dest='verbose', action='store_true')
+parser.add_argument('-s', '--seeds', help=i18n.t('photon.help.seeds'), dest='seeds', nargs="+", default=[])
+parser.add_argument('--stdout', help=i18n.t('photon.help.stdout'), dest='std')
+parser.add_argument('--user-agent', help=i18n.t('photon.help.user-agent'), dest='user_agent')
+parser.add_argument('--exclude', help=i18n.t('photon.help.exclude'), dest='exclude')
+parser.add_argument('--timeout', help=i18n.t('photon.help.timeout'), dest='timeout', type=float)
+parser.add_argument('-p', '--proxy', help=i18n.t('photon.help.proxy'), dest='proxies', type=proxy_type)
+parser.add_argument('--lang', help=i18n.t('photon.help.lang'), dest='lang')
 
 # Switches
-parser.add_argument('--clone', help='clone the website locally', dest='clone',
-                    action='store_true')
-parser.add_argument('--headers', help='add headers', dest='headers',
-                    action='store_true')
-parser.add_argument('--dns', help='enumerate subdomains and DNS data',
-                    dest='dns', action='store_true')
-parser.add_argument('--keys', help='find secret keys', dest='api',
-                    action='store_true')
-parser.add_argument('--update', help='update photon', dest='update',
-                    action='store_true')
-parser.add_argument('--only-urls', help='only extract URLs', dest='only_urls',
-                    action='store_true')
-parser.add_argument('--wayback', help='fetch URLs from archive.org as seeds',
-                    dest='archive', action='store_true')
+parser.add_argument('--clone', help=i18n.t('photon.help.clone'), dest='clone', action='store_true')
+parser.add_argument('--headers', help=i18n.t('photon.help.headers'), dest='headers', action='store_true')
+parser.add_argument('--dns', help=i18n.t('photon.help.dns'), dest='dns', action='store_true')
+parser.add_argument('--keys', help=i18n.t('photon.help.keys'), dest='api', action='store_true')
+parser.add_argument('--update', help=i18n.t('photon.help.update'), dest='update', action='store_true')
+parser.add_argument('--only-urls', help=i18n.t('photon.help.only-urls'), dest='only_urls', action='store_true')
+parser.add_argument('--wayback', help=i18n.t('photon.help.wayback'), dest='archive', action='store_true')
+
+
 args = parser.parse_args()
 
+
+i18n.load_path.append('./translations')
+
+if args.lang:
+    i18n.set('locale', args.lang)
+    i18n.set('fallback', 'en')
 
 # If the user has supplied --update argument
 if args.update:
@@ -125,16 +120,15 @@ api = bool(args.api)  # Extract high entropy strings i.e. API keys and stuff
 
 proxies = []
 if args.proxies:
-    print("%s Testing proxies, can take a while..." % info)
+    print(info, i18n.t('photon.proxy.test'))
     for proxy in args.proxies:
         if is_good_proxy(proxy):
             proxies.append(proxy)
         else:
-            print("%s Proxy %s doesn't seem to work or timedout" %
-                  (bad, proxy['http']))
-    print("%s Done" % info)
+            print(i18n.t('photon.proxy.incorrect', bad=bad, proxy=proxy['http']))
+    print(i18n.t('photon.proxy.incorrect', info=info))
     if not proxies:
-        print("%s no working proxies, quitting!" % bad)
+        print(i18n.t('photon.proxy.no-working', bad=bad))
         exit()
 else:
     proxies.append(None)
@@ -169,7 +163,7 @@ if headers:
     try:
         prompt = prompt()
     except FileNotFoundError as e:
-        print('Could not load headers prompt: {}'.format(e))
+        print(i18n.t('photon.proxy.no-working', e=e))
         quit()
     headers = extract_headers(prompt)
 
@@ -324,7 +318,7 @@ for level in range(crawl_level):
             break
     print('%s Level %i: %i URLs' % (run, level + 1, len(links)))
     try:
-        flash(extractor, links, thread_count)
+        flash(extractor, links, thread_count, i18n)
     except KeyboardInterrupt:
         print('')
         break
@@ -338,8 +332,8 @@ if not only_urls:
         elif not match.startswith('http') and not match.startswith('//'):
             scripts.add(main_url + '/' + match)
     # Step 3. Scan the JavaScript files for endpoints
-    print('%s Crawling %i JavaScript files' % (run, len(scripts)))
-    flash(jscanner, scripts, thread_count)
+    print(i18n.t('photon.crawling', run=run, len=len(scripts)))
+    flash(jscanner, scripts, thread_count, i18n)
 
     for url in internal:
         if '=' in url:
@@ -374,25 +368,35 @@ diff = (now - then)
 minutes, seconds, time_per_request = timer(diff, processed)
 
 # Step 4. Save the results
-if not os.path.exists(output_dir): # if the directory doesn't exist
-    os.mkdir(output_dir) # create a new directory
+if not os.path.exists(output_dir):  # if the directory doesn't exist
+    os.mkdir(output_dir)  # create a new directory
 
 datasets = [files, intel, robots, custom, failed, internal, scripts,
             external, fuzzable, endpoints, keys]
-dataset_names = ['files', 'intel', 'robots', 'custom', 'failed', 'internal',
-                 'scripts', 'external', 'fuzzable', 'endpoints', 'keys']
+
+dataset_names = [i18n.t('photon.dataset.names.files'),
+                 i18n.t('photon.dataset.names.intel'),
+                 i18n.t('photon.dataset.names.robots'),
+                 i18n.t('photon.dataset.names.custom'),
+                 i18n.t('photon.dataset.names.failed'),
+                 i18n.t('photon.dataset.names.internal'),
+                 i18n.t('photon.dataset.names.scripts'),
+                 i18n.t('photon.dataset.names.external'),
+                 i18n.t('photon.dataset.names.fuzzable'),
+                 i18n.t('photon.dataset.names.endpoints'),
+                 i18n.t('photon.dataset.names.keys')]
 
 writer(datasets, dataset_names, output_dir)
 # Printing out results
 print(('%s-%s' % (red, end)) * 50)
 for dataset, dataset_name in zip(datasets, dataset_names):
     if dataset:
-        print('%s %s: %s' % (good, dataset_name.capitalize(), len(dataset)))
+        print(i18n.t('photon.dataset.message', good=good, dataset_name=dataset_name.capitalize(), len_dataset=len(dataset)))
 print(('%s-%s' % (red, end)) * 50)
 
-print('%s Total requests made: %i' % (info, len(processed)))
-print('%s Total time taken: %i minutes %i seconds' % (info, minutes, seconds))
-print('%s Requests per second: %i' % (info, int(len(processed) / diff)))
+print(i18n.t('photon.total.requests', info=info, len=len(processed)))
+print(i18n.t('photon.total.time', info=info, minutes=minutes, seconds=seconds))
+print(i18n.t('photon.total.req-per-second', info=info, i=int(len(processed) / diff)))
 
 datasets = {
     'files': list(files), 'intel': list(intel), 'robots': list(robots),
@@ -418,7 +422,7 @@ if args.export:
     # exporter(directory, format, datasets)
     exporter(output_dir, args.export, datasets)
 
-print('%s Results saved in %s%s%s directory' % (good, green, output_dir, end))
+print(i18n.t('photon.saved', good=good, green=green, output_dir=output_dir, end=end))
 
 if args.std:
     for string in datasets[args.std]:
