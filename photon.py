@@ -149,7 +149,7 @@ external = set()  # URLs that don't belong to the target i.e. out-of-scope
 # URLs that have get params in them e.g. example.com/page.php?id=2
 fuzzable = set()
 endpoints = set()  # URLs found from javascript files
-processed = set(['dummy'])  # URLs that have been crawled
+processed = set(['dummy'])  # URLs that have been crawledpt
 # URLs that belong to the target i.e. in-scope
 internal = set(args.seeds)
 

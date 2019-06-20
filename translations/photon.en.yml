@@ -34,8 +34,8 @@ en:
     not-load: "%{bad}Could not load headers prompt: %{e}"
 
   total:
-    requests: "%{info} TTotal requests made: %{len}"
-    time: "%{info} TTotal time taken: %{minutes} minutes %{seconds} seconds"
+    requests: "%{info} Total requests made: %{len}"
+    time: "%{info} Total time taken: %{minutes} minutes %{seconds} seconds"
     req-per-second: "%{info} Requests per second: %{i}"
 
   saved: "%{good} Results saved in %{green}%{output_dir}%{end} directory"
