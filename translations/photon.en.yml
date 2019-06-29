@@ -27,7 +27,7 @@ en:
   proxy:
     test: Testing proxies, can take a while...
     incorrect: Proxy  doesn't seem to work or timedout
-    done: Feito
+    done: Done
     no-working: "%{bad} no working proxies, quitting!!"
 
   headers:
