@@ -14,6 +14,30 @@ import random
 import i18n
 
 from core.colors import good, info, run, green, red, white, end, bad
+import core.config
+from core.config import INTELS
+from core.flash import flash
+from core.mirror import mirror
+from core.prompt import prompt
+from core.requester import requester
+from core.updater import updater
+from core.utils import (
+    luhn,
+    proxy_type,
+    is_good_proxy,
+    top_level,
+    extract_headers,
+    verb,
+    is_link,
+    entropy,
+    regxy,
+    remove_regex,
+    timer,
+    writer,
+)
+from core.regex import rintels, rendpoint, rhref, rscript, rentropy
+
+from core.zap import zap
 
 # Just a fancy ass banner
 print(
@@ -47,30 +71,6 @@ except ImportError:
     print("%s Photon runs only on Python 3.2 and above." % info)
     quit()
 
-import core.config
-from core.config import INTELS
-from core.flash import flash
-from core.mirror import mirror
-from core.prompt import prompt
-from core.requester import requester
-from core.updater import updater
-from core.utils import (
-    luhn,
-    proxy_type,
-    is_good_proxy,
-    top_level,
-    extract_headers,
-    verb,
-    is_link,
-    entropy,
-    regxy,
-    remove_regex,
-    timer,
-    writer,
-)
-from core.regex import rintels, rendpoint, rhref, rscript, rentropy
-
-from core.zap import zap
 
 # Disable SSL related warnings
 warnings.filterwarnings("ignore")
@@ -243,6 +243,14 @@ def js_extractor(response):
 
 
 def remove_file(url):
+    """
+
+    Args:
+        url:
+
+    Returns:
+
+    """
     if url.count("/") > 2:
         replacable = re.search(r"/[^/]*?$", url).group()
         if replacable != "/":
@@ -271,6 +279,7 @@ def extractor(url):
     if clone:
         mirror(url, response)
     matches = rhref.findall(response)
+
     for link in matches:
         # Remove everything after a "#" to deal with in-page anchors
         link = link[1].replace("'", "").replace('"', "").split("#")[0]
@@ -449,6 +458,7 @@ dataset_names = [
 writer(datasets, dataset_names, output_dir)
 # Printing out results
 print(("%s-%s" % (red, end)) * 50)
+
 for dataset, dataset_name in zip(datasets, dataset_names):
     if dataset:
         print(
